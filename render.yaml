@@ -1,0 +1,13 @@
+
+services:
+  - type: web
+    name: jourknows-api
+    env: docker
+    dockerFilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
