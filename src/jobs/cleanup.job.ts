@@ -1,7 +1,7 @@
 import cron from "node-cron";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { db } from "../db";
+import { articles } from "../db/schema";
+import { lt } from "drizzle-orm";
 
 // Run every day at midnight
 export const startCleanupJob = () => {
@@ -11,16 +11,13 @@ export const startCleanupJob = () => {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const deleted = await prisma.article.deleteMany({
-        where: {
-          createdAt: {
-            lt: thirtyDaysAgo,
-          },
-        },
-      });
+      const deleted = await db
+        .delete(articles)
+        .where(lt(articles.createdAt, thirtyDaysAgo))
+        .returning({ id: articles.id });
 
       console.info(
-        `✅ Cleanup Complete: Deleted ${deleted.count} old articles.`,
+        `✅ Cleanup Complete: Deleted ${deleted.length} old articles.`,
       );
     } catch (error) {
       console.error("❌ Cleanup Job Failed:", error);
