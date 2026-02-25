@@ -1,9 +1,30 @@
+# render.yaml
 
 services:
+  # ==========================================
+  # 1. PRODUCTION ENVIRONMENT (Watches: main)
+  # ==========================================
   - type: web
-    name: jourknows-api
-    env: docker
-    dockerFilePath: ./Dockerfile
+    name: jourknows-api-prod
+    runtime: docker
+    branch: main
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # ==========================================
+  # 2. STAGING ENVIRONMENT (Watches: develop)
+  # ==========================================
+  - type: web
+    name: jourknows-api-staging
+    runtime: docker
+    branch: develop
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production

@@ -1,7 +1,7 @@
 
 # JourKnows Backend (Express + TypeScript)
 
-This is the backend repository for the JourKnows platform, built with **Express.js**, **TypeScript**, and **Prisma**. It follows a **Layered Architecture** to ensure scalability and maintainability.
+This is the backend repository for the JourKnows platform, built with **Express.js**, **TypeScript**, and **Drizzle ORM**. It follows a **Layered Architecture** to ensure scalability and maintainability.
 
 ## Table of Contents
 - [JourKnows Backend (Express + TypeScript)](#jourknows-backend-express--typescript)
@@ -54,9 +54,10 @@ docker-compose up -d
 *Alternatively, use your own local Postgres/Redis instances.*
 
 ### 4. Initialize Database
-Run the Prism migrations to create tables in your local DB:
+Run the Drizzle migrations to create tables in your local DB:
 ```bash
-npx prisma migrate dev --name init
+npm run db:generate
+npm run db:migrate
 ```
 
 ### 5. Start the Server
@@ -98,11 +99,11 @@ src/
 ---
 
 ## Database & Migrations
-We use **Prisma ORM**. The schema is located at `prisma/schema.prisma`.
+We use **Drizzle ORM**. The schema is located at `src/db/schema.ts`.
 
-*   **View DB GUI**: `npx prisma studio`
-*   **Create Migration**: `npx prisma migrate dev --name <migration_name>` (Run this after changing schema.prisma)
-*   **Generate Client**: `npx prisma generate` (Run this if TypeScript complains about missing models)
+*   **View DB GUI**: `npm run db:studio` (Runs Drizzle Studio)
+*   **Generate Migrations**: `npm run db:generate` (Run this after changing schema.ts)
+*   **Apply Migrations**: `npm run db:migrate` (Applies changes to the database)
 
 ---
 

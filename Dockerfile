@@ -24,11 +24,6 @@ COPY package*.json ./
 RUN npm ci --only=production
 
 COPY --from=builder /app/dist ./dist
-# Copy prisma schema for runtime access if needed
-COPY --from=builder /app/prisma ./prisma 
-
-# Generate Prisma Client
-RUN npx prisma generate
 
 EXPOSE 3000
 
