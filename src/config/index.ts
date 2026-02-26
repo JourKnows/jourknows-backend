@@ -14,6 +14,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().optional(), // Make optional locally to avoid crash before DB setup
   REDIS_URL: z.string().optional(),
   MSG_BROKER_URL: z.string().optional(),
+  JWT_SECRET: z.string().optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
