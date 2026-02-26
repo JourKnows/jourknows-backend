@@ -12,10 +12,8 @@ app.use(express.json());
 
 // Routes
 import healthRoutes from "./routes/health.routes";
-import setupRoutes from "./routes/setup.routes";
 
 app.use("/health", healthRoutes);
-app.use("/api/setup", setupRoutes);
 
 // Global Error Handler
 app.use(errorHandler);
