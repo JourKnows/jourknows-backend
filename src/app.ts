@@ -10,10 +10,12 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// Health Check
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", timestamp: new Date() });
-});
+// Routes
+import healthRoutes from "./routes/health.routes";
+import setupRoutes from "./routes/setup.routes";
+
+app.use("/health", healthRoutes);
+app.use("/api/setup", setupRoutes);
 
 // Global Error Handler
 app.use(errorHandler);

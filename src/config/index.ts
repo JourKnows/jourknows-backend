@@ -15,6 +15,8 @@ const envSchema = z.object({
   REDIS_URL: z.string().optional(),
   MSG_BROKER_URL: z.string().optional(),
   JWT_SECRET: z.string().optional(),
+  SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
