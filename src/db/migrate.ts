@@ -13,9 +13,14 @@ const runMigration = async () => {
 
   console.info("⏳ Running database migrations...");
 
+  // Supabase (and many managed DBs) require SSL for external connections
+  const isProduction = process.env.NODE_ENV === "production";
+  const useSSL = isProduction || process.env.DATABASE_URL.includes('sslmode=require');
+
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     max: 1, // Only need 1 connection for migrations
+    ssl: useSSL ? { rejectUnauthorized: false } : undefined,
   });
 
   const db = drizzle(pool);
