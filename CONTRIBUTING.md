@@ -35,7 +35,7 @@ Ensure you have the following installed on your machine:
     npm install
     ```
 3. **Environment Configuration:**
-    Create a `.env` file in the root directory and ensure the following variables are set (reach out to the team for development secrets if needed):
+    Create a `.env` file in the root directory and ensure the following variables are set. **You do not need production secrets for local development.** You can use your own local PostgreSQL/Redis connection strings and dummy values for any other required secrets:
     ```env
     NODE_ENV=development
     DATABASE_URL=postgres://user:password@localhost:5432/jourknows_db
@@ -117,7 +117,8 @@ npm run test:watch  # Run tests in watch mode
 2. Open a Pull Request from your feature branch aiming at `develop`.
 3. Give your PR a descriptive title and fill out the necessary information outlining your changes.
 4. Ensure all GitHub Actions / Status Checks (Linting, Tests) pass successfully.
-5. Request a review from the Code Owners (`@Siruyy`, `@JohnMarkCapones`).
+5. Request a review from the core maintainer (`@Siruyy`) for PRs to `develop`.
+   *Note: `@JohnMarkCapones` only reviews PRs merging into the `main` branch.*
 6. Once approved, the PR can be merged into `develop`.
 
 Happy coding! 🚀
