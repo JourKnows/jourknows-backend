@@ -15,6 +15,14 @@ import { relations } from "drizzle-orm";
 
 // --- Enums ---
 export const roleEnum = pgEnum("role", ["admin", "editor", "writer", "user"]);
+export const reactionTypeEnum = pgEnum("reaction_type", [
+  "like",
+  "love",
+  "haha",
+  "wow",
+  "sad",
+  "angry",
+]);
 
 // --- Identity Layer ---
 export const users = pgTable("users", {
@@ -127,6 +135,24 @@ export const comments = pgTable("comments", {
   ]
 });
 
+export const reactions = pgTable("reactions", {
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
+  articleId: uuid("article_id")
+    .references(() => articles.id, { onDelete: "cascade" })
+    .notNull(),
+  type: reactionTypeEnum("type").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => {
+  return [
+    // A user can only have ONE reaction per article.
+    // This composite PK enforces uniqueness automatically.
+    primaryKey({ name: "reactions_pk", columns: [t.userId, t.articleId] }),
+    index("reactions_article_idx").on(t.articleId),
+  ]
+});
+
 // --- Relationships (For easier nested queries) ---
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
@@ -136,6 +162,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   articles: many(articles, { relationName: "authorArticles" }),
   createdArticles: many(articles, { relationName: "adminArticles" }),
   comments: many(comments), // A user can have many comments
+  reactions: many(reactions), // A user can have many reactions
 }));
 
 export const articlesRelations = relations(articles, ({ one, many }) => ({
@@ -155,6 +182,7 @@ export const articlesRelations = relations(articles, ({ one, many }) => ({
   }),
   tags: many(articleTags),
   comments: many(comments), // An article can have many comments
+  reactions: many(reactions), // An article can have many reactions
 }));
 
 export const articleTagsRelations = relations(articleTags, ({ one }) => ({
@@ -183,4 +211,15 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
     relationName: "commentReplies"
   }),
   replies: many(comments, { relationName: "commentReplies" }),
+}));
+
+export const reactionsRelations = relations(reactions, ({ one }) => ({
+  user: one(users, {
+    fields: [reactions.userId],
+    references: [users.id],
+  }),
+  article: one(articles, {
+    fields: [reactions.articleId],
+    references: [articles.id],
+  }),
 }));
