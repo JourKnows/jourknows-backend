@@ -9,6 +9,7 @@ import {
   jsonb,
   primaryKey,
   index,
+  AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -97,6 +98,35 @@ export const articleTags = pgTable("article_tags", {
   ]
 });
 
+// --- User Engagement Layer ---
+export const comments = pgTable("comments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  articleId: uuid("article_id")
+    .references(() => articles.id, { onDelete: "cascade" })
+    .notNull(),
+  
+  // Author is optional to allow guest/anonymous comments
+  authorId: uuid("author_id")
+    .references(() => users.id, { onDelete: "set null" }), 
+  guestName: varchar("guest_name", { length: 100 }),
+  
+  // Self-referencing foreign key for nested replies
+  parentId: uuid("parent_id").references((): AnyPgColumn => comments.id, { onDelete: "cascade" }),
+  
+  content: text("content").notNull(),
+  
+  // For automatic profanity filtering or manual review
+  isFlagged: boolean("is_flagged").default(false).notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (t) => {
+  return [
+    index("comments_article_idx").on(t.articleId),
+    index("comments_parent_idx").on(t.parentId),
+  ]
+});
+
 // --- Relationships (For easier nested queries) ---
 export const usersRelations = relations(users, ({ one, many }) => ({
   profile: one(profiles, {
@@ -105,6 +135,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   }),
   articles: many(articles, { relationName: "authorArticles" }),
   createdArticles: many(articles, { relationName: "adminArticles" }),
+  comments: many(comments), // A user can have many comments
 }));
 
 export const articlesRelations = relations(articles, ({ one, many }) => ({
@@ -123,6 +154,7 @@ export const articlesRelations = relations(articles, ({ one, many }) => ({
     references: [categories.id],
   }),
   tags: many(articleTags),
+  comments: many(comments), // An article can have many comments
 }));
 
 export const articleTagsRelations = relations(articleTags, ({ one }) => ({
@@ -134,4 +166,21 @@ export const articleTagsRelations = relations(articleTags, ({ one }) => ({
     fields: [articleTags.tagId],
     references: [tags.id],
   }),
+}));
+
+export const commentsRelations = relations(comments, ({ one, many }) => ({
+  article: one(articles, {
+    fields: [comments.articleId],
+    references: [articles.id],
+  }),
+  author: one(users, {
+    fields: [comments.authorId],
+    references: [users.id],
+  }),
+  parentComment: one(comments, {
+    fields: [comments.parentId],
+    references: [comments.id],
+    relationName: "commentReplies"
+  }),
+  replies: many(comments, { relationName: "commentReplies" }),
 }));
