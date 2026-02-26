@@ -38,26 +38,30 @@ cd jourknows-backend
 npm install
 ```
 
-### 2. Configure Environment
-Copy the example environment file:
-```bash
-cp .env.example .env
-```
-Update `.env` with your local credentials if needed.
+### 2. Configure Supabase Environment
+Backend developers must create their own free "Development" project on Supabase to properly test authentication and database queries without affecting staging.
+1. Create a new project on [Supabase](https://supabase.com).
+2. Create your environment file: `cp .env.example .env`
+3. Update `.env` with your new database connection string and API keys (found in Project Settings -> API):
+   ```env
+   DATABASE_URL="postgresql://postgres.xxx:[YOUR-PASSWORD]@aws-0.pooler.supabase.com:6543/postgres"
+   SUPABASE_URL="https://xxx.supabase.co"
+   SUPABASE_SERVICE_ROLE_KEY="your-service-role-key-here"
+   ```
 
-### 3. Start Infrastructure (Docker)
-We use Docker Compose to run Postgres and Redis locally.
+### 3. Start Local Redis
+The backend uses Redis for API rate-limiting against DDoS attacks. Quickly spin it up via Docker:
 ```bash
-# If you have a docker-compose.yml (Create one if needed)
-docker-compose up -d
+docker run -d -p 6379:6379 --name redis redis:alpine
 ```
-*Alternatively, use your own local Postgres/Redis instances.*
+*(Add `REDIS_URL="redis://127.0.0.1:6379"` to your `.env`. If you skip this, the server will boot but rate-limiting will be disabled).*
 
-### 4. Initialize Database
-Run the Drizzle migrations to create tables in your local DB:
+### 4. Initialize Database & Seed Admin
+Push the Drizzle ORM schema to your new Supabase database, then run the local terminal script to seed your first Admin CMS account:
 ```bash
 npm run db:generate
 npm run db:migrate
+npm run seed:admin
 ```
 
 ### 5. Start the Server
@@ -65,7 +69,7 @@ npm run db:migrate
 npm run dev
 ```
 The server will start at `http://localhost:3000`.
-Visit `http://localhost:3000/health` to verify it's working.
+Visit `http://localhost:3000/health/db` to confirm your Supabase connection is active!
 
 ---
 
