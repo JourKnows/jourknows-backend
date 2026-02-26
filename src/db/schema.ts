@@ -7,6 +7,8 @@ import {
   boolean,
   uuid,
   jsonb,
+  primaryKey,
+  index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -73,6 +75,12 @@ export const articles = pgTable("articles", {
   categoryId: uuid("category_id").references(() => categories.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (t) => {
+  return [
+    index("articles_published_idx").on(t.isPublished, t.publishedAt),
+    index("articles_author_idx").on(t.authorId),
+    index("articles_category_idx").on(t.categoryId)
+  ]
 });
 
 // Junction table for Articles <-> Tags
@@ -83,6 +91,10 @@ export const articleTags = pgTable("article_tags", {
   tagId: uuid("tag_id")
     .references(() => tags.id, { onDelete: "cascade" })
     .notNull(),
+}, (t) => {
+  return [
+    primaryKey({ name: "article_tags_pk", columns: [t.articleId, t.tagId] })
+  ]
 });
 
 // --- Relationships (For easier nested queries) ---
