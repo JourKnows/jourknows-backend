@@ -9,9 +9,9 @@ This is the backend repository for the JourKnows platform, built with **Express.
   - [Prerequisites](#prerequisites)
   - [Quick Start](#quick-start)
     - [1. Clone \& Install](#1-clone--install)
-    - [2. Configure Environment](#2-configure-environment)
-    - [3. Start Infrastructure (Docker)](#3-start-infrastructure-docker)
-    - [4. Initialize Database](#4-initialize-database)
+    - [2. Configure Supabase Environment](#2-configure-supabase-environment)
+    - [3. Start Local Redis](#3-start-local-redis)
+    - [4. Initialize Database \& Seed Admin](#4-initialize-database--seed-admin)
     - [5. Start the Server](#5-start-the-server)
   - [Project Architecture](#project-architecture)
   - [Database \& Migrations](#database--migrations)
@@ -83,7 +83,7 @@ src/
 ├── server.ts           # Entry Point (Starts Listener)
 ├── config/             # Environment Variables (Zod schema)
 │
-├── routes/             # 1. API Routes (Defines Endpoints)
+├── routes/             # 1. API Routes (Defines Endpoints under /api/v1/)
 │   └── index.ts
 │
 ├── controllers/        # 2. Request Handlers (Req/Res processing)
