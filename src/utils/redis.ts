@@ -11,9 +11,18 @@ export const connectRedis = async () => {
 
   redisClient = createClient({
     url: config.REDIS_URL,
+    socket: {
+      reconnectStrategy: (retries: number) => {
+        if (retries > 3) {
+          console.warn("⚠️ Redis reconnect failed after 3 attempts, giving up.");
+          return false; // stop reconnecting
+        }
+        return Math.min(retries * 500, 3000);
+      },
+    },
   });
 
-  redisClient.on("error", (err) => console.error("❌ Redis Client Error", err));
+  redisClient.on("error", (err) => console.error("❌ Redis Client Error:", err.message));
   redisClient.on("connect", () => console.info("🔌 Connected to Redis"));
 
   await redisClient.connect();

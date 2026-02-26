@@ -5,8 +5,12 @@ import { startCleanupJob } from "./jobs/cleanup.job";
 
 const startServer = async () => {
   try {
-    // Connect to external services
-    await connectRedis();
+    // Connect to external services (non-fatal if unavailable)
+    try {
+      await connectRedis();
+    } catch (redisError) {
+      console.warn("⚠️ Redis connection failed, continuing without Redis:", redisError);
+    }
 
     // Start background jobs
     startCleanupJob();
