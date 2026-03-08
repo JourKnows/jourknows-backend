@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import winston from "winston";
+import { AppError } from "../utils/app-error";
 
 const logger = winston.createLogger({
   level: "info",
@@ -19,6 +20,18 @@ export const errorHandler = (
   _next: NextFunction,
 ): void => {
   logger.error(err);
+
+  // Application-level errors (404, 400, 409, etc.)
+  if (err instanceof AppError) {
+    res.status(err.statusCode).json({
+      success: false,
+      error: {
+        code: err.code,
+        message: err.message,
+      },
+    });
+    return;
+  }
 
   // Zod Validation Errors
   if (err instanceof ZodError) {
