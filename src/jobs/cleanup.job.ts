@@ -1,7 +1,7 @@
 import cron from "node-cron";
 import { db } from "../db";
 import { articles } from "../db/schema";
-import { lt } from "drizzle-orm";
+import { lt, and, eq } from "drizzle-orm";
 
 // Run every day at midnight
 export const startCleanupJob = () => {
@@ -11,9 +11,10 @@ export const startCleanupJob = () => {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+      // Only delete UNPUBLISHED drafts older than 30 days
       const deleted = await db
         .delete(articles)
-        .where(lt(articles.createdAt, thirtyDaysAgo))
+        .where(and(eq(articles.isPublished, false), lt(articles.createdAt, thirtyDaysAgo)))
         .returning({ id: articles.id });
 
       console.info(

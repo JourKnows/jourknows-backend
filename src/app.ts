@@ -1,13 +1,17 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import { config } from "./config";
 import { errorHandler } from "./middlewares/error.middleware";
 
 const app = express();
 
 // Middlewares
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: config.CORS_ORIGIN ? config.CORS_ORIGIN.split(",") : "*",
+  credentials: true,
+}));
 app.use(express.json());
 
 // Routes
